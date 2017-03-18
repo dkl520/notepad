@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<style type="text/css">
+		.hide {
+			display: none;
+		}
+		
+		#buttom {
+			position: fixed;
+			width: 100%;
+			bottom: 0rem;
+			height: 5rem;
+			display: flex;
+			justify-content: space-around;
+			flex-wrap: wrap;
+		}
+		
+		#theme {
+			position: fixed;
+			width: 100%;
+			bottom: 7rem;
+			height: 2.5rem;
+			display: flex;
+			justify-content: space-around;
+			/*flex-wrap:wrap ;*/
+		}
+	</style>
+	<link rel="stylesheet" type="text/css" href="bulma.css"/>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" type="text/css" href="animate (1).css"/>
+
+	<body>
+
+		<div class="app">
+			<v$header></v$header>
+
+			<div class="columns is-desktop ">
+				<div class="column is-8 is-offset-2">
+
+					<card1></card1>
+
+					<card2></card2>
+
+					<card3></card3>
+				</div>
+
+			</div>
+
+			<theme></theme>
+
+			<v$footer></v$ooter>
+
+		</div>
+		<script src="vue.js" type="text/javascript" charset="utf-8"></script>
+		<script src="vuex@2.2.1.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			let v$header = {
+				template: `
+				  	<div class="notification " :class="[colors]">
+				<div class="columns is-mobile">
+					<div class="column is-5 is-offset-2">
+						<h3 class="title is-3" style="text-align: center;">记事本</h3>
+					</div>
+					<i class="fa fa-bars fa-2x  column is-2  is-offset-1 " @click="openSum">
+					</i>
+				</div>
+
+			    </div>
+				  `,
+				computed: {
+					colors() {
+						return this.$store.state.colors
+					}
+				},
+				methods:{
+					  openSum(){
+					  	  this.$store.state.isActive= !this.$store.state.isActive
+					  }
+				}
+			};
+			let card1 = {
+				template: `
+				<div>
+				<div class="columns is-mobile  is-gapless">
+
+						<div class="field column is-8 ">
+							<p class="control ">
+								<input class="input   is-medium" :class="[colors]" @keyup.enter="submit"  type="text" v-model="message"  placeholder="输入代办事项">
+							</p>
+						</div>
+						<div class="field  column is-3">
+							<p class="control ">
+								<button class="button " :class="[colors]" @click='submit'>提交</button>
+							</p>
+						</div>
+				</div>
+				<div class="card">
+						<header class="card-header" @click="toggle">
+							<p class="card-header-title">
+								未完成
+							</p>
+							<a class="card-header-icon " :class="[colors]">
+								<span class="icon ">
+                          <i class="fa fa-angle-right " :class="{'fa-angle-down':isActive} "></i>
+                                 </span>
+							</a>
+						</header>
+						<div :class="{'card-content':isActive}">
+							<div class="content" :class="{'hide':!isActive}" >
+								<div class="columns is-mobile" v-if='data1!==null' v-for='(index,data) in data' track-by="$index">
+								<div class="field column is-8 " >
+									<p class="control">
+										<label class="checkbox">
+                                        <input type="checkbox" @click="finish(index)" >
+                                        
+                                              <span class="title is-5"  v-text="data"></span>
+                                        </label>
+									</p>
+								</div>
+								<div class="field column is-4" >
+									<p class="control">
+									    <button  class="button  is-outlined" :class="[colors]" @click="cancel(index)">取消</button>
+									</p>
+								</div>
+								
+								</div>
+							</div>
+						</div>
+					</div>
+			    </div>
+				`,
+				data() {
+					return {
+						message: '',
+						isActive: true
+					}
+				},
+				computed: {
+					data() {
+						return this.$store.state.data1
+					},
+					data2() {
+						return this.$store.state.data2
+					},
+					data3() {
+						return this.$store.state.data3
+					},
+					colors() {
+						return this.$store.state.colors
+					}
+				},
+				methods: {
+					toggle() {
+						this.isActive = !this.isActive;
+					},
+					submit() {
+						this.message && this.data.push(this.message)
+						this.message = ""
+						this.isActive = true;
+
+					},
+					cancel(index) {
+						this.data2.push(this.data.splice(index, 1))
+					},
+					finish(index) {
+						this.data3.push(this.data.splice(index, 1))
+					}
+
+				}
+
+			};
+
+			let card2 = {
+				template: `
+				<div class="card  ">
+						<header class="card-header" @click="toggle">
+							<p class="card-header-title">
+								已完成
+							</p>
+							<span class="card-header-icon" :class="[colors]">
+								<span class="icon">
+                          <i class="fa fa-angle-right" :class="{'fa-angle-down':isActive}"></i>
+                                </span>
+							</span>
+						</header>
+						<div :class="{'card-content':isActive}">
+							<div class="content" :class="{'hide':!isActive}" >
+								<div class="columns is-mobile" v-if='data3!==null' v-for='(index,data) in data3' track-by="$index">
+								<div class="field column is-8" >
+									<p class="control">
+										<label class="checkbox">
+                                        <input type="checkbox" @click="unfinish(index)"  checked >
+                                              <span class="title is-5"  v-text="data"></span>
+                                        </label>
+									</p>
+								</div>
+								<div class="field column is-4" >
+									<p class="control">
+									   <span class="title is-5"  v-text="dates"></span>
+									</p>
+								</div>
+								
+								</div>
+								
+							</div>
+						</div>
+
+					</div>
+				`,
+				data() {
+					return {
+						isActive: true
+					}
+				},
+				computed: {
+					data() {
+						return this.$store.state.data1
+					},
+					data2() {
+						return this.$store.state.data2
+					},
+					data3() {
+						return this.$store.state.data3
+					},
+					dates() {
+						let myDate = new Date();
+						let year = myDate.getFullYear(); //获取当前年份(2位)
+						let month = myDate.getMonth() + 1; //获取当前月份(0-11,0代表1月)
+						let datee = myDate.getDate(); //获取当前日(1-31)
+						return `${year}-${month}-${datee}`
+					},
+					colors() {
+						return this.$store.state.colors
+					}
+
+				},
+				methods: {
+					toggle() {
+						this.isActive = !this.isActive;
+					},
+					unfinish(index) {
+						this.data.push(this.data3.splice(index, 1))
+					}
+				}
+
+			};
+
+			let card3 = {
+				template: `
+					<div class="card " >
+						<header class="card-header" @click="toggle">
+							<p class="card-header-title">
+								已取消
+							</p>
+							<span class="card-header-icon" :class="[colors]">
+								<span class="icon">
+                       <i class="fa fa-angle-right" :class="{'fa-angle-down':isActive}"></i>
+                                </span>
+							</span>
+						</header>
+						<div :class="{'card-content':isActive}">
+							<div class="content" :class="{'hide':!isActive}" >
+								<div class="columns is-mobile" v-if='data2!==null' v-for='(index,data) in data2' track-by="$index">
+								<div class="field column is-8" >
+									<p class="control">
+								<span class="title is-5 "> {{data}}</span>                                       
+                                            
+									</p>
+								</div>
+								<div class="field column is-4" >
+									<p class="control">
+									    <button class="button  is-outlined" :class="[colors]" @click="renew(index)">恢复</button>
+									</p>
+								</div>
+								
+								</div>
+								
+							</div>
+						</div>
+					</div>
+				`,
+				data() {
+					return {
+						isActive: true
+					}
+				},
+				computed: {
+					data() {
+						return this.$store.state.data1
+					},
+					data2() {
+						return this.$store.state.data2
+					},
+					data3() {
+						return this.$store.state.data3
+					},
+					colors() {
+						return this.$store.state.colors
+					}
+				},
+				methods: {
+					toggle() {
+						this.isActive = !this.isActive;
+					},
+					renew(index) {
+						this.data.push(this.data2.splice(index, 1))
+					}
+				}
+
+			};
+			let v$footer = {
+				template: `
+				<div  :class="{hide:isActive }">
+				<div id="buttom" class=" notification animated" :class="[colors,animate]">
+				<a class="button  is-inverted is-outlined":class="[colors]"  @click="changeTheme">切换主题</a>
+				<a class="button  is-inverted is-outlined":class="[colors]" @click="downloadData('notepad.txt',getDate)">下载数据</a>
+				<a class="button  is-inverted is-outlined":class="[colors]">编辑数据</a>
+				<a class="button  is-inverted is-outlined":class="[colors]"  @click="showDialog">清空数据</a>
+			</div>
+			</div>
+				`,
+				computed: {
+					colors() {
+						return this.$store.state.colors
+					},
+					getDate() {
+						 const self = this;
+                return JSON.stringify(self.$store.state);
+					},
+					animate(){
+						return this.$store.state.animate[1]
+					},
+					animate2(){
+						return this.$store.state.animate[1]
+					},
+					isActive(){
+						 return this.$store.state.isActive
+					}
+
+				},
+				methods: {
+					downloadData(fileName, content) {
+						let aTag = document.createElement('a');
+						let blob = new Blob([content]);
+						aTag.download = fileName;
+						aTag.href = URL.createObjectURL(blob);
+						aTag.click();
+						URL.revokeObjectURL(blob);
+					},
+				    showDialog(){
+					   this.$store.state.data1=[];
+					   this.$store.state.data2=[];
+					   this.$store.state.data3=[];
+				},
+				changeTheme(){
+					  this.$store.state.isActive2=false;
+				}
+				}
+
+			};
+			let theme = {
+
+				template: `
+				<div :class="{hide:isActive2}">	
+				<div id="theme" class=" notification animated" :class="[animate]">
+				<a class="button is-primary  " @click="changeColor('is-primary')">primary</a>
+				<a class="button is-info   "   @click="changeColor('is-info')   "> info </a>
+				<a class="button is-success  " @click="changeColor('is-success')">success</a>
+				<a class="button is-danger   " @click="changeColor('is-danger') ">danger</a>
+				<a class="button is-dark   "   @click="changeColor('is-dark')   ">  dark</a>
+				<a class="button is-warning  " @click="changeColor('is-warning')">Warning</a>
+			</div>
+			</div>
+				`,
+				computed: {
+					colors() {
+						return this.$store.state.colors
+					},
+					animate(){
+						 return this.$store.state.animate[1] 
+					},
+					isActive2(){
+						return this.$store.state.isActive2
+					}
+				},
+				methods: {
+					changeColor(val) {
+						this.$store.state.colors = val
+						this.$store.state.isActive2=true;
+					}
+				}
+
+			};
+			let store = new Vuex.Store({
+				state: {
+					data1: [],
+					data2: [],
+					data3: [],
+					colors: 'is-primary',
+					isActive:true,
+					isActive2:true,
+					animate:["slideInDown","slideInUp"]
+
+				},
+				mutations: {
+
+				}
+
+			});
+			new Vue({
+				el: '.app',
+				store,
+				components: { v$header, card1, card2, card3, theme, v$footer }
+
+			})
+		</script>
+	</body>
+
+</html>
